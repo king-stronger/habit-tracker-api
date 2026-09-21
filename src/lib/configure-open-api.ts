@@ -3,6 +3,12 @@ import packageJson from "../../package.json" with { type: "json" };
 import type { AppOpenApi } from "./types.js";
 
 export function configureOpenApi(app: AppOpenApi) {
+	app.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
+		type: "apiKey",
+		in: "cookie",
+		name: "better-auth.session_token",
+	});
+
 	app.doc("/doc", {
 		openapi: "3.2.0",
 		info: {
@@ -14,7 +20,10 @@ export function configureOpenApi(app: AppOpenApi) {
 	app.get(
 		"/scalar",
 		Scalar({
-			url: "/doc",
+			sources: [
+				{ url: "/docs", title: "API" },
+				{ url: "/api/auth/open-api/generate-schema", title: "AUTH" }
+			],
 			theme: "kepler",
 			layout: "modern",
 			defaultHttpClient: {
